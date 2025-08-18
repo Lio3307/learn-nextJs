@@ -1,37 +1,14 @@
-"use client";
-
-import { useState } from "react";
+import SideNav from "../../../components/navbar/side-bar";
+import Viewer from "../../../components/viewer";
+import Editor from "../../../components/editor";
 
 export default function NotesPage() {
-  const [isEdit, setIsEdit] = useState<boolean>(false);
+    const isEdit = true;
   return (
     <main id="notes">
-      <section>
-        <div>
-          <button>Save</button>
-          {isEdit ? (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsEdit((prev) => !prev);
-              }}
-            >
-              Edit
-            </button>
-          ) : (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsEdit((prev) => !prev);
-              }}
-            >
-              View
-            </button>
-          )}
-        </div>
-      </section>
+        <SideNav>
+       {isEdit ? (<Editor isEdit={isEdit}/>) :  (<Viewer/>)}
+       </SideNav>
     </main>
   );
 }
