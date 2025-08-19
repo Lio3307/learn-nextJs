@@ -5,11 +5,11 @@ import { useParams } from "next/navigation";
 
 export default function NextDetailNote(){
     const {idNotes} = useParams<{idNotes: string}>()
-    const isEdit = true
+
 
     return (
         <>
-        <Editor isEdit={isEdit} idNote={idNotes} /> 
+        <Editor  idNote={idNotes} /> 
         </>
     )
 }

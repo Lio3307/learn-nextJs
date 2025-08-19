@@ -7,15 +7,10 @@ import { auth, db } from "../../config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Viewer from "./viewer";
 
-export default function Editor({
-  isEdit,
-  idNote,
-}: {
-  isEdit: boolean;
-  idNote: string;
-}) {
+export default function Editor({ idNote }: { idNote: string }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(true);
 
   const [newTitle, setNewTitle] = useState<string | undefined>("");
   const [newDesc, setNewDesc] = useState<string | undefined>("");
@@ -89,12 +84,26 @@ export default function Editor({
               )}
 
               {isEdit ? (
-                <button className="px-6 py-2 rounded-lg font-bold shadow-md bg-yellow-500 hover:bg-yellow-600 text-white transition">
-                  Edit
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setIsEdit((prev) => !prev);
+                  }}
+                  className="px-6 py-2 rounded-lg cursor-pointer font-bold shadow-md bg-yellow-500 hover:bg-yellow-600 text-white transition"
+                >
+                  View
                 </button>
               ) : (
-                <button className="px-6 py-2 rounded-lg font-bold shadow-md bg-gray-600 hover:bg-gray-700 text-white transition">
-                  View
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsEdit((prev) => !prev);
+                  }}
+                  className="px-6 py-2 rounded-lg cursor-pointer font-bold shadow-md bg-gray-600 hover:bg-gray-700 text-white transition"
+                >
+                  Edit
                 </button>
               )}
 
