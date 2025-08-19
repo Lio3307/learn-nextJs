@@ -4,18 +4,17 @@ import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Modal from "../modal";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../../../config/firebase";
 import { NotesType } from "@/app/type";
 import { collection, getDocs } from "firebase/firestore";
 
-
-export default function SideNav({ children }: { children:  ReactNode }) {
+export default function SideNav({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<boolean>(false);
   const pathname = usePathname();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [getUserId, setGetUserId] = useState<string>("");
 
   const [notesData, setNotesData] = useState<NotesType[]>([]);
@@ -33,7 +32,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
             }));
             setNotesData(dataSnap);
           }
-          setIsLoading(false)
+          setIsLoading(false);
         } catch (error) {
           throw new Error(`Cannot get Notes : ${error}`);
         }
@@ -46,8 +45,16 @@ export default function SideNav({ children }: { children:  ReactNode }) {
     return () => unsubs();
   }, []);
 
-  const handleSignOut = () => {
-    console.log("Signed out!");
+  const handleSignOut = async () => {
+    const confirmSignOut = confirm("Are you sure want to sign out?");
+    if (!confirmSignOut) return;
+    try {
+      await signOut(auth);
+      alert("Successfully sign out");
+      window.location.href = "/";
+    } catch (error) {
+      throw new Error(`Cannot sign out : ${error}`);
+    }
   };
 
   return (
@@ -96,7 +103,9 @@ export default function SideNav({ children }: { children:  ReactNode }) {
             >
               +
             </button>
-            {isLoading ? (<p>Loading...</p>): notesData.length === 0 ? (
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : notesData.length === 0 ? (
               <div className="flex justify-center">
                 <p className="text-neutral-300 text-[0.8rem] text-center">
                   You dont have note{" "}
@@ -130,7 +139,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
                 e.stopPropagation();
                 handleSignOut();
               }}
-              className="w-full px-3 py-2 rounded-md font-semibold text-red-500 hover:text-white hover:bg-red-600 transition"
+              className="w-full px-3 py-2 cursor-pointer rounded-md font-semibold text-red-500 hover:text-white hover:bg-red-600 transition"
             >
               Sign Out
             </button>
@@ -143,7 +152,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
           {isModalOpen && (
             <Modal onClose={() => setIsModalOpen(false)} userId={getUserId} />
           )}
-          {isLoading ? (<p>Loading...</p>) : children}
+          {isLoading ? <p>Loading...</p> : children}
         </div>
       </main>
     </div>
