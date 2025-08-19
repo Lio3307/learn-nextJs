@@ -1,7 +1,6 @@
 "use client"
 
 import Editor from "@/components/editor";
-import Viewer from "@/components/viewer";
 import { useParams } from "next/navigation";
 
 export default function NextDetailNote(){
@@ -10,7 +9,7 @@ export default function NextDetailNote(){
 
     return (
         <>
-        {isEdit ? <Editor isEdit={isEdit} idNote={idNotes} /> : <Viewer idNote={idNotes}/>}
+        <Editor isEdit={isEdit} idNote={idNotes} /> 
         </>
     )
 }

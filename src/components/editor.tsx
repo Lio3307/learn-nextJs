@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { auth, db } from "../../config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import Viewer from "./viewer";
 
 export default function Editor({
   isEdit,
@@ -63,28 +64,29 @@ export default function Editor({
           <div className="text-center text-gray-300 py-10">Loading...</div>
         ) : (
           <>
-            {/* Action Buttons */}
             <div className="flex md:mt-0 mt-6 gap-4 items-center">
-              <button
-                disabled={isUpdating}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  try {
-                    setIsUpdating(true);
-                    handleSaveNote();
-                  } finally {
-                    setIsUpdating(false);
-                  }
-                }}
-                className={`px-6 py-2 rounded-lg font-bold shadow-md text-white transition ${
-                  isUpdating
-                    ? "bg-blue-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                }`}
-              >
-                {isUpdating ? "Updating..." : "Save"}
-              </button>
+              {isEdit && (
+                <button
+                  disabled={isUpdating}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                      setIsUpdating(true);
+                      handleSaveNote();
+                    } finally {
+                      setIsUpdating(false);
+                    }
+                  }}
+                  className={`px-6 py-2 rounded-lg font-bold shadow-md text-white transition ${
+                    isUpdating
+                      ? "bg-blue-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                  }`}
+                >
+                  {isUpdating ? "Updating..." : "Save"}
+                </button>
+              )}
 
               {isEdit ? (
                 <button className="px-6 py-2 rounded-lg font-bold shadow-md bg-yellow-500 hover:bg-yellow-600 text-white transition">
@@ -103,24 +105,32 @@ export default function Editor({
               )}
             </div>
 
-                            <p className="text-[0.89rem] text-white font-bold mt-6">Title : </p>
+            {isEdit ? (
+              <>
+                <p className="text-[0.89rem] text-white font-bold mt-6">
+                  Title :{" "}
+                </p>
 
-            <div className="w-full mt-2 space-y-4">
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Note title..."
-                className="w-full px-3 py-2 rounded-lg bg-neutral-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-              />
-              <p className="text-[0.89rem] text-white font-bold">Desc : </p>
-              <textarea
-                value={newDesc}
-                onChange={(e) => setNewDesc(e.target.value)}
-                className="w-full min-h-[23rem] p-3 rounded-lg bg-neutral-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none shadow-sm"
-                placeholder="Write something..."
-              />
-            </div>
+                <div className="w-full mt-2 space-y-4">
+                  <input
+                    type="text"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="Note title..."
+                    className="w-full px-3 py-2 rounded-lg bg-neutral-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                  />
+                  <p className="text-[0.89rem] text-white font-bold">Desc : </p>
+                  <textarea
+                    value={newDesc}
+                    onChange={(e) => setNewDesc(e.target.value)}
+                    className="w-full min-h-[23rem] p-3 rounded-lg bg-neutral-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none shadow-sm"
+                    placeholder="Write something..."
+                  />
+                </div>
+              </>
+            ) : (
+              <Viewer idNote={idNote} />
+            )}
           </>
         )}
       </section>
