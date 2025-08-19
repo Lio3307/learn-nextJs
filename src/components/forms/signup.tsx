@@ -26,12 +26,13 @@ const SignUp = () => {
 
     try {
       setIsLoading(true);
-      const docRef = doc(db, "Users");
-      await createUserWithEmailAndPassword(auth, email, password)
+      const userCredit = await createUserWithEmailAndPassword(auth, email, password)
+
+      const docRef = doc(db, "Users", userCredit.user.uid);
       await setDoc(docRef, {
-        fullName,
-        email,
-        password,
+        fullName: fullName,
+        email: email,
+        password: password,
       });
       alert("Successfully registered user!");
       setFullName("");

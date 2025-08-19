@@ -106,7 +106,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
                 return (
                   <Link
                     key={data.noteId}
-                    href={`/dashboard/${data.noteId}`}
+                    href={`/notes/${data.noteId}`}
                     onClick={() => setOpen(false)}
                     className={`flex mt-2 items-center px-3 py-2 rounded-md font-medium transition-all duration-200 ${
                       active
