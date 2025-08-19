@@ -5,35 +5,44 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Modal from "../modal";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../config/firebase";
+import { auth, db } from "../../../config/firebase";
+import { NotesType } from "@/app/type";
+import { collection, getDocs } from "firebase/firestore";
 
-const navItems = [
-  { name: "Home", to: "" },
-  { name: "Reports", to: "reports" },
-  { name: "Settings", to: "settings" },
-];
 
-export default function SideNav({ children }: { children: ReactNode }) {
+export default function SideNav({ children }: { children:  ReactNode }) {
   const [open, setOpen] = useState<boolean>(false);
   const pathname = usePathname();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const [getUserId, setGetUserId] = useState<string>("")
+  const [getUserId, setGetUserId] = useState<string>("");
 
+  const [notesData, setNotesData] = useState<NotesType[]>([]);
 
   useEffect(() => {
-    const unsubs = onAuthStateChanged(auth, (user) => {
-      if(user){
-        setGetUserId(user.uid)
+    const unsubs = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setGetUserId(user.uid);
+        try {
+          const collRef = collection(db, "Users", user.uid, "Notes");
+          const collSnap = await getDocs(collRef);
+          if (!collSnap.empty) {
+            const dataSnap = collSnap.docs.map((doc) => ({
+              ...(doc.data() as NotesType),
+            }));
+            setNotesData(dataSnap);
+          }
+        } catch (error) {
+          throw new Error(`Cannot get Notes : ${error}`);
+        }
       } else {
         window.location.href = "/";
-        return
+        return;
       }
-    })
+    });
 
-    return () => unsubs()
-  }, [])
-
+    return () => unsubs();
+  }, []);
 
   const handleSignOut = () => {
     console.log("Signed out!");
@@ -75,30 +84,41 @@ export default function SideNav({ children }: { children: ReactNode }) {
 
         <div className="flex-1 flex flex-col justify-between">
           <nav className="p-4 space-y-1">
-            <button 
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              setIsModalOpen(true)
-            }}
-            className="text-white rounded-[0.65rem] cursor-pointer text-[1.6rem] hover:bg-white hover:text-black font-bold text-center my-2 border-1 border-white py-1 px-24">+</button>
-            {navItems.map((t, i) => {
-              const active = pathname === `/dashboard/${t.to}`;
-              return (
-                <Link
-                  key={i}
-                  href={`/dashboard/${t.to}`}
-                  onClick={() => setOpen(false)}
-                  className={`flex mt-2 items-center px-3 py-2 rounded-md font-medium transition-all duration-200 ${
-                    active
-                      ? "bg-blue-600 text-white font-semibold shadow-md"
-                      : "text-gray-300 hover:text-white hover:bg-neutral-700"
-                  }`}
-                >
-                  {t.name}
-                </Link>
-              );
-            })}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsModalOpen(true);
+              }}
+              className="text-white rounded-[0.65rem] cursor-pointer text-[1.6rem] hover:bg-white hover:text-black font-bold text-center my-2 border-1 border-white py-1 px-24"
+            >
+              +
+            </button>
+            {notesData.length === 0 ? (
+              <div className="flex justify-center">
+                <p className="text-neutral-300 text-[0.8rem] text-center">
+                  You dont have note{" "}
+                </p>
+              </div>
+            ) : (
+              notesData.map((data) => {
+                const active = pathname === `/dashboard/${data.noteId}`;
+                return (
+                  <Link
+                    key={data.noteId}
+                    href={`/dashboard/${data.noteId}`}
+                    onClick={() => setOpen(false)}
+                    className={`flex mt-2 items-center px-3 py-2 rounded-md font-medium transition-all duration-200 ${
+                      active
+                        ? "bg-blue-600 text-white font-semibold shadow-md"
+                        : "text-gray-300 hover:text-white hover:bg-neutral-700"
+                    }`}
+                  >
+                    {data.title}
+                  </Link>
+                );
+              })
+            )}
           </nav>
 
           <div className="p-4 border-t border-neutral-700">
@@ -118,7 +138,9 @@ export default function SideNav({ children }: { children: ReactNode }) {
 
       <main className="flex-1 overflow-y-auto bg-gradient-to-b from-neutral-800 to-neutral-900">
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          {isModalOpen && (<Modal onClose={() => setIsModalOpen(false)} userId={getUserId} />)}
+          {isModalOpen && (
+            <Modal onClose={() => setIsModalOpen(false)} userId={getUserId} />
+          )}
           {children}
         </div>
       </main>

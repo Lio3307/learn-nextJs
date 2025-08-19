@@ -1,5 +1,8 @@
+"use client"
+
 import { setDoc, doc } from "firebase/firestore";
 import { useState } from "react";
+
 import { db, auth } from "../../../config/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
