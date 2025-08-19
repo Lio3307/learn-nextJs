@@ -4,7 +4,7 @@ import { NotesType } from "@/app/type";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { auth, db } from "../../config/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export default function Editor({
   isEdit,
@@ -14,23 +14,24 @@ export default function Editor({
   idNote: string;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
-  const [noteData, setNoteData] = useState<NotesType | null>(null);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  const [newTitle, setNewTitle] = useState<string | undefined>(noteData?.title)
-  const [newDesc, setNewDesc] = useState<string | undefined>(noteData?.noteDesc)
-
+  const [newTitle, setNewTitle] = useState<string | undefined>("");
+  const [newDesc, setNewDesc] = useState<string | undefined>("");
+  const [getUserId, setGetUserId] = useState<string>("");
 
   useEffect(() => {
     const unsubs = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        setGetUserId(user.uid);
         setIsLoading(true);
         try {
           const docRef = doc(db, "Users", user.uid, "Notes", idNote);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const docData = docSnap.data() as NotesType;
-            setNoteData(docData);
+            setNewTitle(docData?.title);
+            setNewDesc(docData?.noteDesc);
           }
           setIsLoading(false);
         } catch (error) {
@@ -42,6 +43,19 @@ export default function Editor({
     return () => unsubs();
   }, [idNote]);
 
+  const handleSaveNote = async () => {
+    try {
+      const docRef = doc(db, "Users", getUserId, "Notes", idNote);
+      await updateDoc(docRef, {
+        title: newTitle,
+        noteDesc: newDesc,
+      });
+      alert("Successfully update note");
+    } catch (error) {
+      throw new Error(`Cannot update note : ${error}`);
+    }
+  };
+
   return (
     <div>
       <section>
@@ -50,8 +64,21 @@ export default function Editor({
         ) : (
           <>
             <div className="flex md:mt-0 mt-[2.4rem] gap-4 items-center">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-[0.67rem] shadow-md">
-                Save
+              <button
+                disabled={isUpdating}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  try {
+                    setIsUpdating(true);
+                    handleSaveNote();
+                  } finally {
+                    setIsUpdating(false);
+                  }
+                }}
+                className={`bg-blue-600 {isUpdating ? 'cursor-not-allowed' : 'hover:bg-blue-700 cursor-pointer'} text-white font-bold py-2 px-6 rounded-[0.67rem] shadow-md`}
+              >
+                {isUpdating ? "Updating..." : "Save"}
               </button>
 
               {isEdit ? (
@@ -72,23 +99,29 @@ export default function Editor({
             </div>
 
             <div className="w-full mt-6">
-              <input 
-              value={newTitle}
-              onChange={(e) => {
-                e.preventDefault()
-                if(!newTitle){
-                  setNewTitle("")
-                }
-              }}
-              type="text" />
+              <input
+                type="text"
+                value={newTitle}
+                onChange={(e) => {
+                  e.preventDefault();
+                  if (!newTitle) {
+                    setNewTitle("");
+                  } else {
+                    setNewTitle(e.target.value);
+                  }
+                }}
+              />
+
               <textarea
-              value={newDesc}
-              onChange={(e) => {
-                e.preventDefault()
-                if(!newDesc){
-                  setNewDesc("")
-                }
-              }}
+                value={newDesc}
+                onChange={(e) => {
+                  e.preventDefault();
+                  if (!newDesc) {
+                    setNewDesc("");
+                  } else {
+                    setNewDesc(e.target.value);
+                  }
+                }}
                 className="w-full min-h-[32rem] p-3 rounded-md bg-neutral-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 placeholder="Write something..."
               />
