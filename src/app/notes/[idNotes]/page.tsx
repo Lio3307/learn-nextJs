@@ -1,3 +1,5 @@
+"use client"
+
 import Editor from "@/components/editor";
 import Viewer from "@/components/viewer";
 import { useParams } from "next/navigation";
