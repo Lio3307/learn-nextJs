@@ -5,12 +5,12 @@ import Viewer from "@/components/viewer";
 import { useParams } from "next/navigation";
 
 export default function NextDetailNote(){
-    const {idNote} = useParams<{idNote: string}>()
+    const {idNotes} = useParams<{idNotes: string}>()
     const isEdit = true
 
     return (
         <>
-        {isEdit ? <Editor isEdit={isEdit} idNote={idNote} /> : <Viewer idNote={idNote}/>}
+        {isEdit ? <Editor isEdit={isEdit} idNote={idNotes} /> : <Viewer idNote={idNotes}/>}
         </>
     )
 }
