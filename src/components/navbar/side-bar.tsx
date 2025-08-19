@@ -15,6 +15,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
   const pathname = usePathname();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [getUserId, setGetUserId] = useState<string>("");
 
   const [notesData, setNotesData] = useState<NotesType[]>([]);
@@ -32,6 +33,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
             }));
             setNotesData(dataSnap);
           }
+          setIsLoading(false)
         } catch (error) {
           throw new Error(`Cannot get Notes : ${error}`);
         }
@@ -94,7 +96,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
             >
               +
             </button>
-            {notesData.length === 0 ? (
+            {isLoading ? (<p>Loading...</p>): notesData.length === 0 ? (
               <div className="flex justify-center">
                 <p className="text-neutral-300 text-[0.8rem] text-center">
                   You dont have note{" "}
@@ -141,7 +143,7 @@ export default function SideNav({ children }: { children:  ReactNode }) {
           {isModalOpen && (
             <Modal onClose={() => setIsModalOpen(false)} userId={getUserId} />
           )}
-          {children}
+          {isLoading ? (<p>Loading...</p>) : children}
         </div>
       </main>
     </div>
