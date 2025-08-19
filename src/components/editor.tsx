@@ -60,15 +60,16 @@ export default function Editor({
     <div>
       <section>
         {isLoading ? (
-          <div>Loading...</div>
+          <div className="text-center text-gray-300 py-10">Loading...</div>
         ) : (
           <>
-            <div className="flex md:mt-0 mt-[2.4rem] gap-4 items-center">
+            {/* Action Buttons */}
+            <div className="flex md:mt-0 mt-6 gap-4 items-center">
               <button
                 disabled={isUpdating}
                 onClick={(e) => {
-                  e.stopPropagation();
                   e.preventDefault();
+                  e.stopPropagation();
                   try {
                     setIsUpdating(true);
                     handleSaveNote();
@@ -76,53 +77,47 @@ export default function Editor({
                     setIsUpdating(false);
                   }
                 }}
-                className={`bg-blue-600 {isUpdating ? 'cursor-not-allowed' : 'hover:bg-blue-700 cursor-pointer'} text-white font-bold py-2 px-6 rounded-[0.67rem] shadow-md`}
+                className={`px-6 py-2 rounded-lg font-bold shadow-md text-white transition ${
+                  isUpdating
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                }`}
               >
                 {isUpdating ? "Updating..." : "Save"}
               </button>
 
               {isEdit ? (
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-[0.67rem] shadow-md">
+                <button className="px-6 py-2 rounded-lg font-bold shadow-md bg-yellow-500 hover:bg-yellow-600 text-white transition">
                   Edit
                 </button>
               ) : (
-                <button className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-[0.67rem] shadow-md">
+                <button className="px-6 py-2 rounded-lg font-bold shadow-md bg-gray-600 hover:bg-gray-700 text-white transition">
                   View
                 </button>
               )}
 
               {isEdit && (
-                <p className="text-yellow-400 font-bold underline underline-offset-2 ml-3">
+                <p className="ml-3 text-yellow-400 font-semibold underline underline-offset-2">
                   On Edit Mode
                 </p>
               )}
             </div>
 
-            <div className="w-full mt-6">
+                            <p className="text-[0.89rem] text-white font-bold mt-6">Title : </p>
+
+            <div className="w-full mt-2 space-y-4">
               <input
                 type="text"
                 value={newTitle}
-                onChange={(e) => {
-                  e.preventDefault();
-                  if (!newTitle) {
-                    setNewTitle("");
-                  } else {
-                    setNewTitle(e.target.value);
-                  }
-                }}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Note title..."
+                className="w-full px-3 py-2 rounded-lg bg-neutral-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
               />
-
+              <p className="text-[0.89rem] text-white font-bold">Desc : </p>
               <textarea
                 value={newDesc}
-                onChange={(e) => {
-                  e.preventDefault();
-                  if (!newDesc) {
-                    setNewDesc("");
-                  } else {
-                    setNewDesc(e.target.value);
-                  }
-                }}
-                className="w-full min-h-[32rem] p-3 rounded-md bg-neutral-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                onChange={(e) => setNewDesc(e.target.value)}
+                className="w-full min-h-[23rem] p-3 rounded-lg bg-neutral-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none shadow-sm"
                 placeholder="Write something..."
               />
             </div>
