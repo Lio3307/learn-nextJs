@@ -1,9 +1,9 @@
-import SignUp from "../../../components/forms/signup";
+import SignUp from "@/components/forms/signup";
 
-export default function SignUpPage(){
-    return(
-        <>
-        <SignUp/>
-        </>
-    )
+export default function SignUpPage() {
+  return (
+    <>
+      <SignUp />
+    </>
+  );
 }
