@@ -8,7 +8,7 @@ export default function NextDetailNote(){
 
     return (
         <>
-        {isEdit ? <Editor isEdit={isEdit} idNote={idNote} /> : <Viewer/>}
+        {isEdit ? <Editor isEdit={isEdit} idNote={idNote} /> : <Viewer idNote={idNote}/>}
         </>
     )
 }
