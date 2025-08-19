@@ -1,4 +1,39 @@
+"use client"
+
+import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../config/firebase";
+
 const Login = () => {
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
+
+  const handleLogin = async () => {
+    if(!email.trim() || !password.trim()){
+      alert("Input field cannot empty")
+      return
+    }
+    if(password.length < 6){
+      alert("Password at least 6 length character")
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      await signInWithEmailAndPassword(auth, email, password)
+      setIsLoading(false)
+      setPassword("")
+      setEmail("")
+      alert("Login successfulyy")
+      window.location.href = "/"
+    } catch (error) {
+      throw new Error(`Cannot login : ${error}`);
+      
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md  border-1 border-white rounded-2xl shadow-2xl p-8">
@@ -13,6 +48,11 @@ const Login = () => {
               Email Address
             </label>
             <input
+            value={email}
+            onChange={(e) => {
+              e.preventDefault()
+              setEmail(e.target.value)
+            }}
               id="email"
               type="email"
               placeholder="Enter your email"
@@ -25,6 +65,11 @@ const Login = () => {
               Password
             </label>
             <input
+            value={password}
+            onChange={(e) => {
+              e.preventDefault()
+              setPassword(e.target.value)
+            }}
               id="password"
               type="password"
               placeholder="Enter your password"
@@ -32,17 +77,17 @@ const Login = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <a href="#" className="text-sky-600 hover:underline">
-              Forgot password?
-            </a>
-          </div>
 
           <button
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            handleLogin()
+          }}
             type="submit"
             className="w-full py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shadow-md transition"
           >
-            Sign In
+            {isLoading ? "Sign In..." : "Sign In"}
           </button>
         </form>
 
