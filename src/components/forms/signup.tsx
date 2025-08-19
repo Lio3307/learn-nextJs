@@ -16,6 +16,11 @@ const SignUp = () => {
       return;
     }
 
+    if(password.length < 6){
+      alert("Password at least 6 character length")
+      return
+    }
+
     try {
       setIsLoading(true);
       const docRef = doc(db, "Users");
